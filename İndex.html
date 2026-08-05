@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optiyo v12.8 - Ürün & Fiyat Karşılaştırma Platformu</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        optiyo: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-optiyo-600 text-white p-2 rounded-xl font-bold text-xl flex items-center justify-center w-10 h-10 shadow-md">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight text-slate-900">Optiyo <span class="text-optiyo-600 text-xs px-2 py-0.5 bg-optiyo-50 border border-optiyo-100 rounded-full ml-1">v12.8 Web</span></h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">Akıllı Fiyat ve Ürün Karşılaştırma Asistanı</p>
+                </div>
+            </div>
+
+            <!-- Search Bar in Header -->
+            <div class="flex-1 max-w-lg mx-4 hidden md:block">
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Binlerce ürün, Akakçe ve Cimri seviyesinde fiyat ara..." class="w-full bg-slate-100 border border-slate-200 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-optiyo-500 focus:bg-white transition-all">
+                    <i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="openAddModal()" class="bg-optiyo-600 hover:bg-optiyo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition flex items-center space-x-2">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span class="hidden sm:inline">Ürün Ekle</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Search Bar -->
+    <div class="p-4 bg-white border-b border-slate-200 md:hidden">
+        <div class="relative">
+            <input type="text" id="mobileSearchInput" placeholder="Ürün veya market ara..." class="w-full bg-slate-100 border border-slate-200 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-optiyo-500 focus:bg-white">
+            <i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+        
+        <!-- Welcome Banner / Stats -->
+        <div class="bg-gradient-to-r from-optiyo-700 to-optiyo-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
+            <div class="absolute right-0 top-0 bottom-0 w-1/3 bg-white/5 opacity-50 transform skew-x-12 pointer-events-none"></div>
+            <div class="relative z-10 max-w-2xl">
+                <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">v12.8 Kararlı Sürüm</span>
+                <h2 class="text-2xl sm:text-3xl font-bold mt-3">En İyi Fiyatları Anında Karşılaştırın</h2>
+                <p class="text-optiyo-100 text-sm sm:text-base mt-2">Akakçe ve Cimri seviyesindeki akıllı fiyat takip mekanizmasıyla en ucuz marketi ve güvenilir tedarikçiyi tek tıkla bulun.</p>
+                
+                <div class="mt-6 flex flex-wrap gap-4 text-xs sm:text-sm">
+                    <div class="bg-black/25 backdrop-blur-sm px-4 py-2 rounded-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-box text-optiyo-400"></i>
+                        <span id="statTotalProducts" class="font-bold">0 Ürün Listeleniyor</span>
+                    </div>
+                    <div class="bg-black/25 backdrop-blur-sm px-4 py-2 rounded-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-tag text-optiyo-400"></i>
+                        <span id="statCheapest" class="font-bold">Direkt Mağaza Linkleri Aktif</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters & Category Navigation -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <div class="flex items-center space-x-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0" id="categoryFilters">
+                <button onclick="filterCategory('all')" class="category-btn active px-4 py-2 rounded-lg text-sm font-medium bg-optiyo-600 text-white shadow-sm transition whitespace-nowrap">Tümü</button>
+                <button onclick="filterCategory('Elektronik')" class="category-btn px-4 py-2 rounded-lg text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition whitespace-nowrap">Elektronik</button>
+                <button onclick="filterCategory('Moda')" class="category-btn px-4 py-2 rounded-lg text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition whitespace-nowrap">Moda & Giyim</button>
+                <button onclick="filterCategory('Ev & Yaşam')" class="category-btn px-4 py-2 rounded-lg text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition whitespace-nowrap">Ev & Yaşam</button>
+                <button onclick="filterCategory('Kişisel Bakım')" class="category-btn px-4 py-2 rounded-lg text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition whitespace-nowrap">Kişisel Bakım</button>
+            </div>
+
+            <!-- Sort Options -->
+            <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                <span class="text-xs text-slate-500 whitespace-nowrap">Sırala:</span>
+                <select id="sortSelect" onchange="sortProducts()" class="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-optiyo-500 shadow-sm">
+                    <option value="default">Varsayılan</option>
+                    <option value="price-asc">En Düşük Fiyat</option>
+                    <option value="price-desc">En Yüksek Fiyat</option>
+                    <option value="name">Ürün Adına Göre (A-Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Dynamic products will be injected here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16">
+            <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-slate-400 text-2xl mb-4">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-700">Ürün Bulunamadı</h3>
+            <p class="text-sm text-slate-500 mt-1">Arama kriterinize uygun ürün bulunamadı veya filtreyi değiştirebilirsiniz.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+            <p>© 2026 Optiyo v12.8. Akakçe ve Cimri seviyesinde akıllı karşılaştırma motoru.</p>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-optiyo-600 transition">Gizlilik Politikası</a>
+                <a href="#" class="hover:text-optiyo-600 transition">Kullanım Koşulları</a>
+                <a href="#" class="hover:text-optiyo-600 transition">İletişim</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                    <i class="fa-solid fa-plus-circle text-optiyo-600"></i>
+                    <span>Yeni Ürün / Link Ekle</span>
+                </h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <form id="productForm" onsubmit="addNewProduct(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Ürün Adı</label>
+                    <input type="text" id="newTitle" required placeholder="Örn: Apple AirPods Pro 2" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-optiyo-500 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Kategori</label>
+                    <select id="newCategory" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-optiyo-500 focus:bg-white">
+                        <option value="Elektronik">Elektronik</option>
+                        <option value="Moda">Moda & Giyim</option>
+                        <option value="Ev & Yaşam">Ev & Yaşam</option>
+                        <option value="Kişisel Bakım">Kişisel Bakım</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Fiyat (TL)</label>
+                        <input type="number" step="0.01" id="newPrice" required placeholder="4999.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-optiyo-500 focus:bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Market / Mağaza</label>
+                        <input type="text" id="newStore" required placeholder="Örn: Hepsiburada" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-optiyo-500 focus:bg-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Ürün / Mağaza Linki (URL)</label>
+                    <input type="url" id="newLink" required placeholder="https://hepsiburada.com/urun-ornegi..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-optiyo-500 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Ürün Görsel URL (İsteğe bağlı)</label>
+                    <input type="url" id="newImage" placeholder="https://ornek.com/gorsel.jpg" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-optiyo-500 focus:bg-white">
+                </div>
+                
+                <div class="pt-4 flex space-x-3">
+                    <button type="button" onclick="closeAddModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-lg text-sm font-semibold transition">İptal</button>
+                    <button type="submit" class="flex-1 bg-optiyo-600 hover:bg-optiyo-700 text-white py-2.5 rounded-lg text-sm font-semibold shadow-sm transition">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initial Database with Real Redirect URLs
+        let products = [
+            {
+                id: 1,
+                title: "Apple AirPods Pro (2. Nesil)",
+                category: "Elektronik",
+                price: 8499.00,
+                store: "Hepsiburada",
+                link: "https://www.hepsiburada.com",
+                image: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400&auto=format&fit=crop&q=80",
+                rating: 4.8,
+                reviews: 1420
+            },
+            {
+                id: 2,
+                title: "Dyson V12 Detect Slim Kablosuz Süpürge",
+                category: "Ev & Yaşam",
+                price: 24999.00,
+                store: "Trendyol",
+                link: "https://www.trendyol.com",
+                image: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=400&auto=format&fit=crop&q=80",
+                rating: 4.9,
+                reviews: 890
+            },
+            {
+                id: 3,
+                title: "Nike Air Force 1 '07 Spor Ayakkabı",
+                category: "Moda",
+                price: 4299.00,
+                store: "Boyner",
+                link: "https://www.boyner.com.tr",
+                image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&auto=format&fit=crop&q=80",
+                rating: 4.7,
+                reviews: 2150
+            },
+            {
+                id: 4,
+                title: "Philips Lumea IPL Epilasyon Cihazı",
+                category: "Kişisel Bakım",
+                price: 12750.00,
+                store: "Amazon TR",
+                link: "https://www.amazon.com.tr",
+                image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&auto=format&fit=crop&q=80",
+                rating: 4.6,
+                reviews: 630
+            },
+            {
+                id: 5,
+                title: "Samsung Galaxy S24 Ultra 256GB",
+                category: "Elektronik",
+                price: 61999.00,
+                store: "MediaMarkt",
+                link: "https://www.mediamarkt.com.tr",
+                image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&auto=format&fit=crop&q=80",
+                rating: 4.9,
+                reviews: 410
+            },
+            {
+                id: 6,
+                title: "Kahve Makinesi Espresso Otomatik",
+                category: "Ev & Yaşam",
+                price: 9850.00,
+                store: "Teknosa",
+                link: "https://www.teknosa.com",
+                image: "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=400&auto=format&fit=crop&q=80",
+                rating: 4.5,
+                reviews: 320
+            }
+        ];
+
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+        const productGrid = document.getElementById('productGrid');
+        const emptyState = document.getElementById('emptyState');
+        const searchInput = document.getElementById('searchInput');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        const statTotalProducts = document.getElementById('statTotalProducts');
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            mobileSearchInput.value = e.target.value;
+            renderProducts();
+        });
+
+        mobileSearchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            searchInput.value = e.target.value;
+            renderProducts();
+        });
+
+        function renderProducts() {
+            let filtered = products.filter(item => {
+                const matchesCategory = currentCategory === 'all' || item.category === currentCategory;
+                const matchesSearch = item.title.toLowerCase().includes(searchQuery) || item.store.toLowerCase().includes(searchQuery);
+                return matchesCategory && matchesSearch;
+            });
+
+            statTotalProducts.innerText = `${filtered.length} Ürün Listeleniyor`;
+
+            if (filtered.length === 0) {
+                productGrid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            productGrid.innerHTML = filtered.map(item => `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition duration-200 overflow-hidden flex flex-col">
+                    <div class="relative bg-slate-100 h-48 overflow-hidden group">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-slate-800 text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                            ${item.category}
+                        </span>
+                        <span class="absolute top-3 right-3 bg-optiyo-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                            ${item.store}
+                        </span>
+                    </div>
+                    
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center space-x-1 text-amber-500 text-xs mb-1.5">
+                                <i class="fa-solid fa-star"></i>
+                                <span class="font-bold text-slate-700">${item.rating}</span>
+                                <span class="text-slate-400">(${item.reviews})</span>
+                            </div>
+                            <h3 class="font-semibold text-slate-800 text-sm line-clamp-2 mb-2">${item.title}</h3>
+                        </div>
+                        
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between mt-2">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block uppercase font-medium">En Ucuz Fiyat</span>
+                                <span class="text-lg font-black text-optiyo-700">${item.price.toLocaleString('tr-TR')} ₺</span>
+                            </div>
+                            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="bg-optiyo-600 hover:bg-optiyo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow-sm">
+                                <span>Mağazaya Git</span>
+                                <i class="fa-solid fa-external-link-alt text-[10px]"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if(btn.innerText.toLowerCase().includes(category.toLowerCase()) || (category === 'all' && btn.innerText === 'Tümü')) {
+                    btn.className = "category-btn active px-4 py-2 rounded-lg text-sm font-medium bg-optiyo-600 text-white shadow-sm transition whitespace-nowrap";
+                } else {
+                    btn.className = "category-btn px-4 py-2 rounded-lg text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition whitespace-nowrap";
+                }
+            });
+
+            renderProducts();
+        }
+
+        function sortProducts() {
+            const sortBy = document.getElementById('sortSelect').value;
+            
+            if (sortBy === 'price-asc') {
+                products.sort((a, b) => a.price - b.price);
+            } else if (sortBy === 'price-desc') {
+                products.sort((b, a) => a.price - b.price);
+            } else if (sortBy === 'name') {
+                products.sort((a, b) => a.title.localeCompare(b.title, 'tr'));
+            } else {
+                products.sort((a, b) => a.id - b.id);
+            }
+            
+            renderProducts();
+        }
+
+        function openAddModal() {
+            document.getElementById('addProductModal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addProductModal').classList.add('hidden');
+            document.getElementById('productForm').reset();
+        }
+
+        function addNewProduct(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('newTitle').value;
+            const category = document.getElementById('newCategory').value;
+            const price = parseFloat(document.getElementById('newPrice').value);
+            const store = document.getElementById('newStore').value;
+            const link = document.getElementById('newLink').value;
+            let image = document.getElementById('newImage').value;
+
+            if (!image) {
+                image = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop&q=80";
+            }
+
+            const newProduct = {
+                id: products.length + 1,
+                title,
+                category,
+                price,
+                store,
+                link,
+                image,
+                rating: 5.0,
+                reviews: 1
+            };
+
+            products.unshift(newProduct);
+            renderProducts();
+            closeAddModal();
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
