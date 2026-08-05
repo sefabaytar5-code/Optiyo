@@ -2,574 +2,224 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Optiyo — Akıllı Fiyat Asistanı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Optiyo Demo</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #3b82f6;
-      --accent2: #22c55e;
-      --danger: #ef4444;
-      --border: #334155;
-      --radius: 12px;
+      --bg: #0f172a; --card: #1e293b; --text: #f1f5f9;
+      --muted: #94a3b8; --accent: #3b82f6; --green: #22c55e; --border: #334155;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      line-height: 1.45;
-    }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
     header {
-      position: sticky; top: 0; z-index: 20;
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
-      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      position: sticky; top: 0; background: #0f172aee; border-bottom: 1px solid var(--border);
+      padding: 12px 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; z-index: 10;
     }
-    header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
-    header h1 span { color: var(--accent); }
+    h1 { font-size: 1.1rem; } h1 span { color: var(--accent); }
     .spacer { flex: 1; }
-    nav { display: flex; gap: 8px; flex-wrap: wrap; }
-    button, .btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      font-weight: 600;
+    button {
+      background: var(--accent); color: #fff; border: 0; border-radius: 8px;
+      padding: 8px 12px; font-weight: 600; font-size: 0.85rem;
     }
-    button.ghost, .btn.ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    main { max-width: 960px; margin: 0 auto; padding: 16px; }
+    button.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    main { max-width: 640px; margin: 0 auto; padding: 14px; }
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-      margin-bottom: 12px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px; margin-bottom: 10px;
     }
-    .search-row { display: flex; gap: 8px; margin-bottom: 16px; }
-    .search-row input, input, select {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 1rem;
+    .product { display: flex; gap: 12px; cursor: pointer; }
+    .thumb {
+      width: 64px; height: 64px; border-radius: 8px; background: #0f172a;
+      display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;
     }
-    .product {
-      display: flex; gap: 12px; align-items: flex-start;
-      cursor: pointer; transition: border-color 0.15s;
-    }
-    .product:hover { border-color: var(--accent); }
-    .product img {
-      width: 72px; height: 72px; object-fit: cover;
-      border-radius: 8px; background: var(--bg);
-    }
-    .product .meta { flex: 1; min-width: 0; }
-    .product .name { font-weight: 600; margin-bottom: 4px; }
-    .product .sub { color: var(--muted); font-size: 0.85rem; }
+    .name { font-weight: 600; }
+    .sub { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
     .badge {
-      display: inline-block;
-      background: #1d4ed8;
-      color: #fff;
-      font-size: 0.75rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      margin-top: 6px;
+      display: inline-block; margin-top: 6px; background: #1d4ed8; color: #fff;
+      font-size: 0.72rem; padding: 2px 8px; border-radius: 999px;
     }
-    .muted { color: var(--muted); font-size: 0.9rem; }
-    .error { color: var(--danger); padding: 12px; }
-    .ok { color: var(--accent2); }
+    .search { display: flex; gap: 8px; margin-bottom: 12px; }
+    input {
+      flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 10px; font-size: 1rem;
+    }
     .hidden { display: none !important; }
+    .muted { color: var(--muted); font-size: 0.9rem; }
     .price-row {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px 0; border-bottom: 1px solid var(--border);
     }
-    .price-row:last-child { border-bottom: none; }
-    .price-val { font-weight: 700; font-size: 1.1rem; color: var(--accent2); }
-    .modal-bg {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 50; padding: 16px;
+    .price-row:last-child { border-bottom: 0; }
+    .price { color: var(--green); font-weight: 700; font-size: 1.05rem; }
+    .note {
+      background: #172554; border: 1px solid #1e40af; border-radius: 10px;
+      padding: 10px 12px; margin-bottom: 14px; font-size: 0.85rem; color: #bfdbfe;
     }
-    .modal {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      width: 100%; max-width: 400px;
-    }
-    .modal h2 { margin-bottom: 14px; font-size: 1.2rem; }
-    .modal label { display: block; font-size: 0.85rem; color: var(--muted); margin: 10px 0 4px; }
-    .modal .actions { display: flex; gap: 8px; margin-top: 16px; }
-    footer {
-      text-align: center; padding: 24px; color: var(--muted); font-size: 0.8rem;
-    }
-    .settings { font-size: 0.85rem; }
-    #detailImg {
-      width: 100%; max-height: 240px; object-fit: contain;
-      border-radius: 8px; background: var(--bg); margin-bottom: 12px;
-    }
-    .toast {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: #022c22; color: #6ee7b7; border: 1px solid #065f46;
-      padding: 10px 16px; border-radius: 8px; z-index: 100; max-width: 90%;
-    }
+    footer { text-align: center; padding: 20px; color: var(--muted); font-size: 0.75rem; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Opt<span>iyo</span></h1>
+    <h1>Opt<span>iyo</span> <small style="font-weight:400;color:#94a3b8;font-size:0.75rem">Demo</small></h1>
     <div class="spacer"></div>
-    <nav>
-      <button type="button" class="ghost" data-view="home">Ürünler</button>
-      <button type="button" class="ghost" data-view="search">Ara</button>
-      <button type="button" class="ghost" data-view="barcode">Barkod</button>
-      <button type="button" class="ghost" id="btnAuth">Giriş</button>
-      <button type="button" class="ghost" data-view="settings">Ayar</button>
-    </nav>
+    <button type="button" class="ghost" id="btnHome">Ürünler</button>
+    <button type="button" class="ghost" id="btnSearch">Ara</button>
   </header>
 
   <main>
-    <section id="view-home">
-      <p class="muted" style="margin-bottom:12px">Öne çıkan / yüksek skorlu ürünler</p>
-      <div id="productList"><p class="muted">Yükleniyor…</p></div>
-    </section>
+    <div class="note">
+      Bu sürüm <strong>bilgisayarsız demo</strong>dur. Veriler telefonda gömülü örnek ürünlerdir; gerçek mağaza API’si yoktur.
+    </div>
 
-    <section id="view-search" class="hidden">
-      <div class="search-row">
-        <input id="searchInput" type="search" placeholder="Ürün adı yaz…" autocomplete="off" />
-        <button type="button" id="btnSearch">Ara</button>
+    <section id="listView">
+      <div class="search">
+        <input id="q" type="search" placeholder="Ürün ara…" />
+        <button type="button" id="goSearch">Ara</button>
       </div>
-      <div id="searchResults"></div>
+      <div id="list"></div>
     </section>
 
-    <section id="view-barcode" class="hidden">
-      <div class="card">
-        <p class="muted" style="margin-bottom:10px">13 haneli EAN-13 barkod gir</p>
-        <div class="search-row">
-          <input id="barcodeInput" type="text" inputmode="numeric" maxlength="13" placeholder="Örn: 8690123456789" />
-          <button type="button" id="btnBarcode">Sorgula</button>
-        </div>
-        <div id="barcodeResult"></div>
-      </div>
-    </section>
-
-    <section id="view-detail" class="hidden">
+    <section id="detailView" class="hidden">
       <button type="button" class="ghost" id="btnBack" style="margin-bottom:12px">← Geri</button>
-      <div id="detailBox"></div>
-    </section>
-
-    <section id="view-settings" class="hidden">
-      <div class="card settings">
-        <h2 style="margin-bottom:10px;font-size:1.1rem">API Ayarları</h2>
-        <label class="muted">API taban adresi</label>
-        <input id="apiBaseInput" type="url" placeholder="http://127.0.0.1:8000" style="width:100%;margin:8px 0" />
-        <button type="button" id="btnSaveApi">Kaydet</button>
-        <p class="muted" style="margin-top:12px">
-          Örnekler:<br>
-          • Yerel: <code>http://127.0.0.1:8000</code><br>
-          • LAN: <code>http://192.168.x.x:8000</code>
-        </p>
-        <p id="healthStatus" class="muted" style="margin-top:12px"></p>
-        <button type="button" class="ghost" id="btnHealth" style="margin-top:8px">Bağlantıyı test et</button>
-      </div>
-      <div class="card hidden" id="profileCard">
-        <h2 style="margin-bottom:8px;font-size:1.1rem">Hesap</h2>
-        <div id="profileInfo" class="muted"></div>
-        <button type="button" class="ghost" id="btnLogout" style="margin-top:10px">Çıkış yap</button>
-      </div>
+      <div id="detail"></div>
     </section>
   </main>
 
-  <footer>Optiyo Web · Backend API gerekir</footer>
-
-  <div id="authModal" class="modal-bg hidden">
-    <div class="modal">
-      <h2 id="authTitle">Giriş yap</h2>
-      <div id="regNameWrap" class="hidden">
-        <label>Ad</label>
-        <input id="authName" type="text" />
-      </div>
-      <label>E-posta</label>
-      <input id="authEmail" type="email" autocomplete="username" />
-      <label>Şifre</label>
-      <input id="authPass" type="password" autocomplete="current-password" />
-      <div class="actions">
-        <button type="button" id="btnAuthSubmit">Giriş</button>
-        <button type="button" class="ghost" id="btnAuthToggle">Kayıt ol</button>
-        <button type="button" class="ghost" id="btnAuthClose">Kapat</button>
-      </div>
-      <p id="authError" class="error hidden" style="margin-top:10px"></p>
-    </div>
-  </div>
-
-  <div id="toast" class="toast hidden"></div>
+  <footer>Optiyo Demo · Backend yok · Sadece arayüz</footer>
 
   <script>
-(function () {
-  const $ = (s) => document.querySelector(s);
-  const $$ = (s) => [...document.querySelectorAll(s)];
-  const state = { view: "home", registerMode: false, lastView: "home" };
+    // Örnek (sahte) ürünler — API yok
+    var PRODUCTS = [
+      {
+        id: "1",
+        name: "iPhone 15 128 GB",
+        brand: "Apple",
+        category: "Telefon",
+        emoji: "📱",
+        score: 88,
+        prices: [
+          { store: "Trendyol", price: 42999 },
+          { store: "Hepsiburada", price: 43499 },
+          { store: "Amazon", price: 43999 }
+        ]
+      },
+      {
+        id: "2",
+        name: "Samsung Galaxy A55",
+        brand: "Samsung",
+        category: "Telefon",
+        emoji: "📲",
+        score: 76,
+        prices: [
+          { store: "Trendyol", price: 18999 },
+          { store: "Hepsiburada", price: 19249 }
+        ]
+      },
+      {
+        id: "3",
+        name: "AirPods Pro 2",
+        brand: "Apple",
+        category: "Kulaklık",
+        emoji: "🎧",
+        score: 91,
+        prices: [
+          { store: "Trendyol", price: 8999 },
+          { store: "Amazon", price: 8799 },
+          { store: "Hepsiburada", price: 9099 }
+        ]
+      },
+      {
+        id: "4",
+        name: "Dyson V15 Detect",
+        brand: "Dyson",
+        category: "Ev",
+        emoji: "🧹",
+        score: 84,
+        prices: [
+          { store: "Hepsiburada", price: 27999 },
+          { store: "Trendyol", price: 28499 }
+        ]
+      },
+      {
+        id: "5",
+        name: "Nescafe Gold 200g",
+        brand: "Nescafe",
+        category: "Market",
+        emoji: "☕",
+        score: 70,
+        prices: [
+          { store: "Migros", price: 289 },
+          { store: "Trendyol", price: 275 }
+        ]
+      }
+    ];
 
-  function getBase() {
-    let b = localStorage.getItem("optiyo_api") || "http://127.0.0.1:8000";
-    return b.replace(/\/$/, "");
-  }
-  function apiRoot() {
-    const b = getBase();
-    return b.endsWith("/api/v1") ? b : b + "/api/v1";
-  }
-  function token() { return localStorage.getItem("optiyo_access") || ""; }
-  function setTokens(access, refresh) {
-    if (access) localStorage.setItem("optiyo_access", access);
-    if (refresh) localStorage.setItem("optiyo_refresh", refresh);
-    updateAuthBtn();
-  }
-  function clearTokens() {
-    localStorage.removeItem("optiyo_access");
-    localStorage.removeItem("optiyo_refresh");
-    updateAuthBtn();
-  }
-  function toast(msg, ms) {
-    ms = ms || 2800;
-    const t = $("#toast");
-    t.textContent = msg;
-    t.classList.remove("hidden");
-    setTimeout(function () { t.classList.add("hidden"); }, ms);
-  }
-  function esc(s) {
-    return String(s == null ? "" : s)
-      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  }
+    function $(id) { return document.getElementById(id); }
 
-  async function api(path, opts) {
-    opts = opts || {};
-    const headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
-    const t = token();
-    if (t) headers["Authorization"] = "Bearer " + t;
-    let res = await fetch(apiRoot() + path, Object.assign({}, opts, { headers: headers }));
-    if (res.status === 401 && localStorage.getItem("optiyo_refresh")) {
-      try {
-        const rr = await fetch(apiRoot() + "/auth/refresh", {
-          method: "POST",
-          headers: { Authorization: "Bearer " + localStorage.getItem("optiyo_refresh") }
-        });
-        if (rr.ok) {
-          const data = await rr.json();
-          setTokens(data.access_token, data.refresh_token);
-          headers["Authorization"] = "Bearer " + data.access_token;
-          res = await fetch(apiRoot() + path, Object.assign({}, opts, { headers: headers }));
-        }
-      } catch (e) {}
+    function card(p) {
+      return (
+        '<div class="card product" data-id="' + p.id + '">' +
+          '<div class="thumb">' + p.emoji + '</div>' +
+          '<div><div class="name">' + p.name + '</div>' +
+          '<div class="sub">' + p.brand + " · " + p.category + "</div>" +
+          '<span class="badge">Skor ' + p.score + "</span></div></div>"
+      );
     }
-    return res;
-  }
 
-  function showView(name) {
-    state.view = name;
-    ["home", "search", "barcode", "detail", "settings"].forEach(function (v) {
-      const el = $("#view-" + v);
-      if (el) el.classList.toggle("hidden", v !== name);
-    });
-  }
-
-  function productCard(p) {
-    const img = p.image_url
-      ? '<img src="' + esc(p.image_url) + '" alt="" onerror="this.style.display=\'none\'" />'
-      : '<div style="width:72px;height:72px;background:#0f172a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#64748b">📦</div>';
-    const score = p.ai_score != null
-      ? '<span class="badge">Skor ' + Number(p.ai_score).toFixed(0) + "</span>"
-      : "";
-    return (
-      '<div class="card product" data-id="' + esc(p.id) + '">' + img +
-      '<div class="meta"><div class="name">' + esc(p.name) + '</div>' +
-      '<div class="sub">' + esc(p.brand) + " · " + esc(p.category) + "</div>" +
-      score + "</div></div>"
-    );
-  }
-
-  async function loadProducts() {
-    const box = $("#productList");
-    box.innerHTML = '<p class="muted">Yükleniyor…</p>';
-    try {
-      const res = await api("/products");
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const list = await res.json();
-      if (!list.length) {
-        box.innerHTML = '<p class="muted">Ürün yok. Backend çalışıyor mu? Ayarlardan API adresini kontrol et.</p>';
+    function renderList(items) {
+      var box = $("list");
+      if (!items.length) {
+        box.innerHTML = '<p class="muted">Sonuç yok</p>';
         return;
       }
-      box.innerHTML = list.map(productCard).join("");
+      box.innerHTML = items.map(card).join("");
       box.querySelectorAll(".product").forEach(function (el) {
-        el.addEventListener("click", function () { openDetail(el.dataset.id); });
+        el.onclick = function () { openDetail(el.getAttribute("data-id")); };
       });
-    } catch (e) {
-      box.innerHTML = '<p class="error">Bağlantı hatası: ' + esc(e.message) + ". Ayar → API adresini kontrol et.</p>";
     }
-  }
 
-  async function doSearch() {
-    const q = $("#searchInput").value.trim();
-    const box = $("#searchResults");
-    if (!q) { box.innerHTML = ""; return; }
-    box.innerHTML = '<p class="muted">Aranıyor…</p>';
-    try {
-      const res = await api("/products/search?q=" + encodeURIComponent(q));
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const list = await res.json();
-      if (!list.length) { box.innerHTML = '<p class="muted">Sonuç yok</p>'; return; }
-      box.innerHTML = list.map(productCard).join("");
-      box.querySelectorAll(".product").forEach(function (el) {
-        el.addEventListener("click", function () { openDetail(el.dataset.id); });
+    function openDetail(id) {
+      var p = PRODUCTS.filter(function (x) { return x.id === id; })[0];
+      if (!p) return;
+      $("listView").classList.add("hidden");
+      $("detailView").classList.remove("hidden");
+      var min = Math.min.apply(null, p.prices.map(function (x) { return x.price; }));
+      var rows = p.prices.map(function (x) {
+        var best = x.price === min ? ' <span class="badge">En ucuz</span>' : "";
+        return (
+          '<div class="price-row"><span>' + x.store + best +
+          '</span><span class="price">' + x.price.toLocaleString("tr-TR") + " ₺</span></div>"
+        );
+      }).join("");
+      $("detail").innerHTML =
+        '<div class="card"><div class="thumb" style="width:80px;height:80px;font-size:2rem;margin-bottom:10px">' +
+        p.emoji + "</div>" +
+        "<h2 style='font-size:1.2rem'>" + p.name + "</h2>" +
+        '<p class="sub">' + p.brand + " · " + p.category + "</p>" +
+        '<span class="badge">Skor ' + p.score + "</span></div>" +
+        '<div class="card"><div class="name" style="margin-bottom:8px">Fiyatlar (örnek)</div>' +
+        rows + "</div>" +
+        '<p class="muted" style="margin-top:10px">Not: Linkler demo; gerçek mağaza yönlendirmesi yok.</p>';
+    }
+
+    function showList() {
+      $("detailView").classList.add("hidden");
+      $("listView").classList.remove("hidden");
+      var q = ($("q").value || "").trim().toLowerCase();
+      var items = PRODUCTS.filter(function (p) {
+        if (!q) return true;
+        return (p.name + p.brand + p.category).toLowerCase().indexOf(q) !== -1;
       });
-    } catch (e) {
-      box.innerHTML = '<p class="error">' + esc(e.message) + "</p>";
+      renderList(items);
     }
-  }
 
-  async function doBarcode() {
-    const code = $("#barcodeInput").value.trim();
-    const box = $("#barcodeResult");
-    if (!/^\d{13}$/.test(code)) {
-      box.innerHTML = '<p class="error">13 haneli sayı gir</p>';
-      return;
-    }
-    box.innerHTML = '<p class="muted">Sorgulanıyor…</p>';
-    try {
-      const res = await api("/barcode/" + code);
-      if (!res.ok) {
-        const err = await res.json().catch(function () { return {}; });
-        throw new Error(err.detail || "HTTP " + res.status);
-      }
-      const data = await res.json();
-      const p = data.product;
-      var html = productCard(p);
-      (data.prices || []).forEach(function (pr) {
-        html += '<div class="price-row"><span>' + esc(pr.store) +
-          '</span><span class="price-val">' + Number(pr.price).toFixed(2) + " ₺</span></div>";
-      });
-      box.innerHTML = html;
-      var card = box.querySelector(".product");
-      if (card) card.addEventListener("click", function () { openDetail(p.id); });
-    } catch (e) {
-      box.innerHTML = '<p class="error">' + esc(e.message) + "</p>";
-    }
-  }
+    $("btnHome").onclick = function () { $("q").value = ""; showList(); };
+    $("btnSearch").onclick = function () { $("q").focus(); };
+    $("goSearch").onclick = showList;
+    $("q").onkeydown = function (e) { if (e.key === "Enter") showList(); };
+    $("btnBack").onclick = showList;
 
-  async function openDetail(id) {
-    state.lastView = state.view === "detail" ? state.lastView : state.view;
-    showView("detail");
-    const box = $("#detailBox");
-    box.innerHTML = '<p class="muted">Yükleniyor…</p>';
-    try {
-      const pr = await api("/products/" + id);
-      const px = await api("/prices/" + id);
-      if (!pr.ok) throw new Error("Ürün bulunamadı");
-      const p = await pr.json();
-      const prices = px.ok ? await px.json() : [];
-      var img = p.image_url ? '<img id="detailImg" src="' + esc(p.image_url) + '" alt="" />' : "";
-      var pricesHtml = prices.length
-        ? prices.map(function (x) {
-            return '<div class="price-row"><div><div>' + esc(x.store) + '</div>' +
-              '<div class="muted" style="font-size:0.8rem">' +
-              (x.updated_at ? new Date(x.updated_at).toLocaleString("tr-TR") : "") +
-              '</div></div><div style="text-align:right"><div class="price-val">' +
-              Number(x.price).toFixed(2) + ' ₺</div>' +
-              '<button type="button" class="ghost" style="margin-top:6px;padding:4px 10px;font-size:0.8rem" data-store="' +
-              esc(x.store) + '" data-url="' + esc(x.store_url || "") + '" data-pid="' + esc(p.id) +
-              '">Mağazaya git</button></div></div>';
-          }).join("")
-        : '<p class="muted" style="padding:12px 0">Fiyat kaydı yok</p>';
-      box.innerHTML =
-        img +
-        '<h2 style="font-size:1.25rem;margin-bottom:6px">' + esc(p.name) + "</h2>" +
-        '<p class="muted">' + esc(p.brand) + " · " + esc(p.category) + "</p>" +
-        (p.ai_score != null
-          ? '<span class="badge">AI Skor ' + Number(p.ai_score).toFixed(1) + "</span>"
-          : "") +
-        '<h3 style="margin:18px 0 8px;font-size:1rem">Fiyatlar</h3>' +
-        '<div class="card" style="padding:4px 14px">' + pricesHtml + "</div>";
-      box.querySelectorAll("button[data-store]").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          affiliateClick(btn.dataset.pid, btn.dataset.store, btn.dataset.url);
-        });
-      });
-    } catch (e) {
-      box.innerHTML = '<p class="error">' + esc(e.message) + "</p>";
-    }
-  }
-
-  async function affiliateClick(productId, store, storeUrl) {
-    try {
-      const res = await api("/affiliate/click", {
-        method: "POST",
-        body: JSON.stringify({
-          product_id: productId,
-          store: store,
-          original_url: storeUrl || null
-        })
-      });
-      if (!res.ok) throw new Error("Tıklama kaydı başarısız");
-      const data = await res.json();
-      var url = data.redirect_url;
-      if (url && url.indexOf("http") !== 0) {
-        url = getBase().replace(/\/api\/v1$/, "") + url;
-      }
-      if (url) window.open(url, "_blank");
-      else if (storeUrl) window.open(storeUrl, "_blank");
-      toast("Yönlendiriliyor…");
-    } catch (e) {
-      if (storeUrl) window.open(storeUrl, "_blank");
-      else toast(e.message);
-    }
-  }
-
-  function updateAuthBtn() {
-    $("#btnAuth").textContent = token() ? "Hesap" : "Giriş";
-  }
-
-  async function loadProfile() {
-    const card = $("#profileCard");
-    if (!token()) { card.classList.add("hidden"); return; }
-    try {
-      const res = await api("/user/profile");
-      if (!res.ok) throw new Error();
-      const u = await res.json();
-      card.classList.remove("hidden");
-      $("#profileInfo").innerHTML =
-        "<strong>" + esc(u.name) + "</strong><br>" + esc(u.email) + "<br>Rol: " + esc(u.role);
-    } catch (e) {
-      card.classList.add("hidden");
-    }
-  }
-
-  async function submitAuth() {
-    const email = $("#authEmail").value.trim();
-    const password = $("#authPass").value;
-    const name = $("#authName").value.trim();
-    const err = $("#authError");
-    err.classList.add("hidden");
-    try {
-      if (state.registerMode) {
-        const r = await api("/auth/register", {
-          method: "POST",
-          body: JSON.stringify({ email: email, password: password, name: name })
-        });
-        if (!r.ok) {
-          const d = await r.json().catch(function () { return {}; });
-          throw new Error(d.detail || "Kayıt başarısız");
-        }
-      }
-      const res = await api("/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email: email, password: password })
-      });
-      if (!res.ok) throw new Error("Giriş başarısız");
-      const data = await res.json();
-      setTokens(data.access_token, data.refresh_token);
-      $("#authModal").classList.add("hidden");
-      toast("Giriş başarılı");
-      loadProfile();
-    } catch (e) {
-      err.textContent = e.message;
-      err.classList.remove("hidden");
-    }
-  }
-
-  async function testHealth() {
-    const el = $("#healthStatus");
-    el.textContent = "Test ediliyor…";
-    try {
-      const base = getBase().replace(/\/api\/v1$/, "");
-      const res = await fetch(base + "/health");
-      const data = await res.json();
-      el.innerHTML = '<span class="ok">Bağlantı OK</span> — ' + esc(JSON.stringify(data));
-    } catch (e) {
-      el.innerHTML = '<span class="error">Bağlantı yok: ' + esc(e.message) + "</span>";
-    }
-  }
-
-  $$("nav [data-view]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      const v = b.dataset.view;
-      showView(v);
-      if (v === "home") loadProducts();
-      if (v === "settings") {
-        $("#apiBaseInput").value = getBase();
-        loadProfile();
-      }
-    });
-  });
-  $("#btnSearch").addEventListener("click", doSearch);
-  $("#searchInput").addEventListener("keydown", function (e) {
-    if (e.key === "Enter") doSearch();
-  });
-  $("#btnBarcode").addEventListener("click", doBarcode);
-  $("#barcodeInput").addEventListener("keydown", function (e) {
-    if (e.key === "Enter") doBarcode();
-  });
-  $("#btnBack").addEventListener("click", function () {
-    showView(state.lastView || "home");
-  });
-  $("#btnSaveApi").addEventListener("click", function () {
-    var v = \( ("#apiBaseInput").value.trim().replace(/\/ \)/, "");
-    localStorage.setItem("optiyo_api", v);
-    toast("API kaydedildi");
-    testHealth();
-  });
-  $("#btnHealth").addEventListener("click", testHealth);
-  $("#btnAuth").addEventListener("click", function () {
-    if (token()) {
-      showView("settings");
-      $("#apiBaseInput").value = getBase();
-      loadProfile();
-    } else {
-      state.registerMode = false;
-      $("#authTitle").textContent = "Giriş yap";
-      $("#regNameWrap").classList.add("hidden");
-      $("#btnAuthSubmit").textContent = "Giriş";
-      $("#btnAuthToggle").textContent = "Kayıt ol";
-      $("#authError").classList.add("hidden");
-      $("#authModal").classList.remove("hidden");
-    }
-  });
-  $("#btnAuthClose").addEventListener("click", function () {
-    $("#authModal").classList.add("hidden");
-  });
-  $("#btnAuthToggle").addEventListener("click", function () {
-    state.registerMode = !state.registerMode;
-    $("#authTitle").textContent = state.registerMode ? "Kayıt ol" : "Giriş yap";
-    $("#regNameWrap").classList.toggle("hidden", !state.registerMode);
-    $("#btnAuthSubmit").textContent = state.registerMode ? "Kayıt ol" : "Giriş";
-    $("#btnAuthToggle").textContent = state.registerMode ? "Girişe dön" : "Kayıt ol";
-  });
-  $("#btnAuthSubmit").addEventListener("click", submitAuth);
-  $("#btnLogout").addEventListener("click", function () {
-    clearTokens();
-    $("#profileCard").classList.add("hidden");
-    toast("Çıkış yapıldı");
-  });
-
-  $("#apiBaseInput").value = getBase();
-  updateAuthBtn();
-  loadProducts();
-})();
+    showList();
   </script>
 </body>
 </html>
